@@ -13,9 +13,14 @@ CREATE TABLE IF NOT EXISTS users(
 
 CREATE TABLE IF NOT EXISTS collections(
 	collection_id SERIAL PRIMARY KEY,
+	user_id int NOT NULL,
 	collection_name VARCHAR(64) UNIQUE NOT NULL,
-	daily_limit positive_or_zero DEFAULT 10
+	daily_limit positive_or_zero DEFAULT 10,
 
+	CONSTRAINT collection_owner
+		FOREIGN KEY (user_id)
+			REFERENCES users(user_id)
+			ON DELETE CASCADE
 );
 	
 CREATE TABLE IF NOT EXISTS mems(
@@ -40,16 +45,22 @@ CREATE TABLE IF NOT EXISTS mems(
 );
 
 --DROP TABLE IF EXISTS mems;
---DROP TABLE IF EXISTS users;
 --DROP TABLE IF EXISTS collections;
+--DROP TABLE IF EXISTS users;
 
 --SELECT * FROM users;
 --SELECT * FROM collections;
 --SELECT * FROM mems;
 
+-- INSERT INTO collections(user_id, collection_name)
+-- VALUES (1, 'first collection');
+
+-- INSERT INTO users(user_name)
+-- VALUES ('John Doe');
+
 --INSERT INTO mems (user_id, collection_id, 
 --				  question_text, answer_text, review_time) 
---VALUES (2, 3, 'dsfa', 'dfasdfsa', NOW());
+--VALUES (1, 1, 'Question text', 'Answer text', NOW());
 
 --ALTER SEQUENCE mems_mem_id_seq RESTART;
 --ALTER SEQUENCE collections_collection_id_seq RESTART;
