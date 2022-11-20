@@ -13,6 +13,7 @@ namespace Database_Access_Level
         public string? AdditionalInfo { get; set; }
         public string? ImagePath { get; set; }
         public DateTime? ReviewTime { get; set; }
+        public string? Status { get; set; }
 
         public virtual Collection Collection { get; set; } = null!;
         public virtual User User { get; set; } = null!;

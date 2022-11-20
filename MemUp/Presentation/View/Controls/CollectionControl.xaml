@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="Presentation.View.Controls.CollectionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Presentation.View.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="140" d:DesignWidth="240">
+    <DockPanel>
+        <Label x:Name="collectionNameLabel"
+                   Content="New collection" VerticalAlignment="Center" FontSize="16"
+                   DockPanel.Dock="Left"/>
+        <StackPanel DockPanel.Dock="Right">
+            <Label x:Name="collectionReviewLabel"
+                   Content="40" FontSize="13" FontStyle="Italic" Foreground="lime" Padding="-5"/>
+            <Label x:Name="collectionStudyLabel"
+                   Content="14" FontSize="13" FontStyle="Italic" Foreground="#F1F000" Padding="-5"/>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

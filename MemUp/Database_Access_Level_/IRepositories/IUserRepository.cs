@@ -8,6 +8,7 @@ namespace Database_Access_Level.IRepositories
 {
     public interface IUserRepository: IRepository<User>
     {
-        //
+        Task<User?> CreateOrLoginUser(string username);
+        bool IsUsernameValid(string username);
     }
 }

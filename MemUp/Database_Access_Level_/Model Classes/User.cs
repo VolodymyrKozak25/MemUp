@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Database_Access_Level
 {
@@ -7,8 +8,8 @@ namespace Database_Access_Level
     {
         public User()
         {
-            Collections = new HashSet<Collection>();
-            Mems = new HashSet<Mem>();
+            Collections = new ObservableCollection<Collection>();
+            Mems = new ObservableCollection<Mem>();
         }
 
         public int UserId { get; set; }
@@ -16,8 +17,9 @@ namespace Database_Access_Level
         public int MpBalance { get; set; }
         public int DayStreak { get; set; }
         public bool? MessagesStatus { get; set; }
+        public DateTime LastLogin { get; set; }
 
-        public virtual ICollection<Collection> Collections { get; set; }
-        public virtual ICollection<Mem> Mems { get; set; }
+        public virtual ObservableCollection<Collection> Collections { get; set; }
+        public virtual ObservableCollection<Mem> Mems { get; set; }
     }
 }

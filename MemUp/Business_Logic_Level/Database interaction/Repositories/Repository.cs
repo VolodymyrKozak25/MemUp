@@ -32,14 +32,18 @@ namespace Business_Logic.Repositories
             return context.Set<TEntity>().Where(predicate);
         }
 
-        public async Task<TEntity> GetByIdAsync(int id)
+        public async Task<TEntity?> GetByIdAsync(int id)
         {
             return await context.Set<TEntity>().FindAsync(id);
         }
 
-        public async Task<IEnumerable<TEntity>> GetTableAsync()
+        //public async Task<IEnumerable<TEntity>> GetTableAsync()
+        //{
+        //    return await context.Set<TEntity>().ToListAsync();
+        //}
+        public IEnumerable<TEntity> GetTable()
         {
-            return await context.Set<TEntity>().ToListAsync();
+            return context.Set<TEntity>().ToList();
         }
 
         public void Remove(TEntity entity)
@@ -61,5 +65,6 @@ namespace Business_Logic.Repositories
         {
             return context.Set<TEntity>().Local;
         }
+
     }
 }

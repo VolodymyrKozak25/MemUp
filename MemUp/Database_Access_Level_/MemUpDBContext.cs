@@ -47,6 +47,15 @@ namespace Database_Access_Level
                     .HasColumnName("daily_limit")
                     .HasDefaultValueSql("10");
 
+                entity.Property(e => e.StudyQueue)
+                    .HasColumnName("study_queue")
+                    .HasDefaultValueSql("10");
+
+                entity.Property(e => e.ReviewQueue)
+                    .HasColumnName("review_queue")
+                    .HasDefaultValueSql("0");
+
+
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.User)
@@ -71,7 +80,14 @@ namespace Database_Access_Level
 
                 entity.Property(e => e.QuestionText).HasColumnName("question_text");
 
-                entity.Property(e => e.ReviewTime).HasColumnName("review_time");
+                entity.Property(e => e.ReviewTime)
+                    .HasColumnName("review_time")
+                    .HasDefaultValueSql("(CURRENT_DATE + '1 day'::interval)");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(6)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("'study'::character varying");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
@@ -96,6 +112,10 @@ namespace Database_Access_Level
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.Property(e => e.DayStreak).HasColumnName("day_streak");
+
+                entity.Property(e => e.LastLogin)
+                    .HasColumnName("last_login")
+                    .HasDefaultValueSql("now()");
 
                 entity.Property(e => e.MessagesStatus)
                     .HasColumnName("messages_status")

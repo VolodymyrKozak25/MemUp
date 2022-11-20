@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS users(
 	user_name VARCHAR(16) UNIQUE NOT NULL,
 	MP_balance positive_or_zero,
 	day_streak positive_or_zero,
-	messages_status boolean DEFAULT TRUE
+	messages_status boolean DEFAULT TRUE,
+	last_login TIMESTAMPTZ DEFAULT NOW()
 
 );
 
@@ -16,13 +17,15 @@ CREATE TABLE IF NOT EXISTS collections(
 	user_id int NOT NULL,
 	collection_name VARCHAR(64) UNIQUE NOT NULL,
 	daily_limit positive_or_zero DEFAULT 10,
+	study_queue positive_or_zero DEFAULT 10,
+	review_queue positive_or_zero DEFAULT 0,
 
 	CONSTRAINT collection_owner
 		FOREIGN KEY (user_id)
 			REFERENCES users(user_id)
 			ON DELETE CASCADE
 );
-	
+
 CREATE TABLE IF NOT EXISTS mems(
 	mem_id SERIAL PRIMARY KEY,
 	user_id int NOT NULL,
@@ -31,7 +34,8 @@ CREATE TABLE IF NOT EXISTS mems(
 	answer_text TEXT NOT NULL,
 	additional_info TEXT,
 	image_path TEXT,
-	review_time TIMESTAMPTZ,
+	review_time TIMESTAMPTZ DEFAULT CURRENT_DATE + INTERVAL '1 day',
+	status VARCHAR(6) DEFAULT 'study',
 	
 	CONSTRAINT user_profile
 		FOREIGN KEY (user_id)
@@ -52,15 +56,15 @@ CREATE TABLE IF NOT EXISTS mems(
 --SELECT * FROM collections;
 --SELECT * FROM mems;
 
--- INSERT INTO collections(user_id, collection_name)
--- VALUES (1, 'first collection');
+--INSERT INTO collections(user_id, collection_name)
+--VALUES (1, 'first collection');
 
 -- INSERT INTO users(user_name)
 -- VALUES ('John Doe');
 
---INSERT INTO mems (user_id, collection_id, 
---				  question_text, answer_text, review_time) 
---VALUES (1, 1, 'Question text', 'Answer text', NOW());
+INSERT INTO mems (user_id, collection_id, 
+				  question_text, answer_text) 
+VALUES (1, 1, 'What is 2 + 2?', '4');
 
 --ALTER SEQUENCE mems_mem_id_seq RESTART;
 --ALTER SEQUENCE collections_collection_id_seq RESTART;

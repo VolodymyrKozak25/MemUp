@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +16,9 @@ namespace Database_Access_Level.IRepositories
         Task AddRangeAsync(IEnumerable<TEntity> entities);
 
         //getting data (Read)
-        Task<TEntity> GetByIdAsync(int id);
-        Task<IEnumerable<TEntity>> GetTableAsync();
+        Task<TEntity?> GetByIdAsync(int id);
+        //Task<IEnumerable<TEntity>> GetTableAsync();
+        IEnumerable<TEntity> GetTable();
         IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
 
         //removing data (Delete)
