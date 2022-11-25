@@ -16,7 +16,11 @@ namespace Business_Logic_Level.ViewModel.Commands
             VM = vm;
         }
 
-        public event EventHandler? CanExecuteChanged;
+        public event EventHandler? CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
 
         public bool CanExecute(object? parameter)
         {

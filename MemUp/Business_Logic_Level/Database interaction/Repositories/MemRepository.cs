@@ -14,6 +14,15 @@ namespace Business_Logic.Repositories
         {
         }
 
+        //public async Task<IOrderedEnumerable<Mem>> LoadAllForCollection(Collection collection, string status)
+        //{
+        //    var mems = context.Set<Mem>()
+        //        .Where(m => m.CollectionId == collection.CollectionId
+        //                   & m.Status == status
+        //                   & m.ReviewTime < DateTime.UtcNow)
+        //        .OrderBy(m => m.ReviewTime);
+        //}
+
         public async Task<int> EvaluateReviewQueue(Collection collection)
         {
             var memsToReview = await context.Set<Mem>()

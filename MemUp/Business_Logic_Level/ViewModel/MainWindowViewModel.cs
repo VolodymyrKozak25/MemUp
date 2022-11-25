@@ -26,7 +26,7 @@ namespace Business_Logic_Level.ViewModel
         private Visibility signedInVisibility;
 
         private Collection selectedCollection;
-        private Mem? currentMem;
+        private Mem currentMem;
 
 
         public MainWindowViewModel()
@@ -51,6 +51,16 @@ namespace Business_Logic_Level.ViewModel
             AnswerMemCommand = new AnswerMemCommand(this);
         }
 
+
+        public ObservableCollection<Collection> UserCollections { get; set; }
+        public ObservableCollection<Mem> SelectedCollectionMems { get; set; }
+
+        public SearchCollectionCommand SearchColletionCommand { get; set; }
+        public LoginUserCommand LoginUserCommand { get; set; }
+        public DeleteCollectionCommand DeleteCollectionCommand { get; set; }
+        public LoadMemListCommand LoadMemListCommand { get; set; }
+        public DeleteMemCommand DeleteMemCommand { get; set; }
+        public AnswerMemCommand AnswerMemCommand { get; set; }
 
         public bool IsUserSigned
         {
@@ -113,7 +123,7 @@ namespace Business_Logic_Level.ViewModel
             }
         }
 
-        public Mem? CurrentMem
+        public Mem CurrentMem
         {
             get { return currentMem; }
             set
@@ -122,7 +132,6 @@ namespace Business_Logic_Level.ViewModel
                 OnPropertyChanged("CurrentMem");
             }
         }
-
 
         public string CollectionQuery
         {
@@ -141,15 +150,6 @@ namespace Business_Logic_Level.ViewModel
         }
 
 
-        public ObservableCollection<Collection> UserCollections { get; set; }
-        public ObservableCollection<Mem> SelectedCollectionMems { get; set; }
-
-        public SearchCollectionCommand SearchColletionCommand { get; set; }
-        public LoginUserCommand LoginUserCommand { get; set; }
-        public DeleteCollectionCommand DeleteCollectionCommand { get; set; }
-        public LoadMemListCommand LoadMemListCommand { get; set; }
-        public DeleteMemCommand DeleteMemCommand { get; set; }
-        public AnswerMemCommand AnswerMemCommand { get; set; }
 
         public void SearchColletionsInList()
         {
@@ -190,6 +190,22 @@ namespace Business_Logic_Level.ViewModel
 
                 FindAllUserCollections(null);
 
+                UpdateUserLastLogin();
+            }
+        }
+
+        public async void UpdateUserLastLogin()
+        {
+            using (_unitOfWork = new UnitOfWork(new MemUpDBContext()))
+            {
+                var user = await _unitOfWork.Users.GetByIdAsync(CurrentUser.UserId);
+
+                if (user != null)
+                {
+                    user.LastLogin = DateTime.UtcNow;
+                    await _unitOfWork.SaveAsync();
+                }
+
             }
         }
 
@@ -213,8 +229,11 @@ namespace Business_Logic_Level.ViewModel
             {
                 var collection = await _unitOfWork.Collections.GetByIdAsync(selectedCollection.CollectionId);
 
-                _unitOfWork.Collections.Remove(collection);
-                await _unitOfWork.SaveAsync();
+                if (collection != null)
+                {
+                    _unitOfWork.Collections.Remove(collection);
+                    await _unitOfWork.SaveAsync();
+                }
             }
 
             FindAllUserCollections(null);
@@ -227,18 +246,18 @@ namespace Business_Logic_Level.ViewModel
             using (_unitOfWork = new UnitOfWork(new MemUpDBContext()))
             {
                 var reviewMems = _unitOfWork.Mems
-                .Find(m => m.CollectionId == SelectedCollection.CollectionId & m.Status == "review")
-                .OrderBy(m => m.ReviewTime)
-                .Take(SelectedCollection.ReviewQueue);
+                .Find(m => m.CollectionId == SelectedCollection.CollectionId
+                           & m.Status == "review")
+                .OrderBy(m => m.ReviewTime);
                 foreach (var mem in reviewMems)
                 {
                     SelectedCollectionMems.Add(mem);
                 }
 
                 var studyMems = _unitOfWork.Mems
-                    .Find(m => m.CollectionId == SelectedCollection.CollectionId & m.Status == "study")
-                    .OrderBy(m => m.ReviewTime)
-                    .Take(SelectedCollection.StudyQueue);
+                    .Find(m => m.CollectionId == SelectedCollection.CollectionId
+                               & m.Status == "study")
+                    .OrderBy(m => m.ReviewTime);
                 foreach (var mem in studyMems)
                 {
                     SelectedCollectionMems.Add(mem);
@@ -248,16 +267,40 @@ namespace Business_Logic_Level.ViewModel
 
         public void SelectNextMem()
         {
-            CurrentMem = SelectedCollectionMems.FirstOrDefault();
+            var mem = SelectedCollectionMems.FirstOrDefault();
+            if (mem != null)
+            {
+                CurrentMem = mem;
+                return;
+            }
+            CurrentMem = new Mem();
         }
 
         public async void DeleteCurrentMem()
         {
-            var previousMem = currentMem;
-            CurrentMem = SelectedCollectionMems.Skip(1).FirstOrDefault();
-            _unitOfWork.Mems.Remove(previousMem);
+            using (_unitOfWork = new UnitOfWork(new MemUpDBContext()))
+            {
+                if (CurrentMem.QuestionText == null)
+                {
+                    MessageBox.Show("Cannot delete empty mem.",
+                        "Deleting empty mem",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                    return;
+                }
 
-            await _unitOfWork.SaveAsync();
+                var previousMem = currentMem;
+                var nextMem = SelectedCollectionMems.Skip(1).FirstOrDefault();
+                if (nextMem != null)
+                {
+                    CurrentMem = nextMem;
+                }
+                CurrentMem = new Mem();
+
+                _unitOfWork.Mems.Remove(previousMem);
+
+                await _unitOfWork.SaveAsync();
+            }
         }
 
         public async void AnswerButtonPressed(string timeIdentifier)
@@ -266,45 +309,47 @@ namespace Business_Logic_Level.ViewModel
             {
                 var thisMem = await _unitOfWork.Mems.GetByIdAsync(currentMem.MemId);
 
-                if(thisMem.Status == "study")
+                if (thisMem != null)
                 {
-                    thisMem.Status = "review";
+                    if (thisMem.Status == "study")
+                    {
+                        thisMem.Status = "review";
+                    }
+
+                    switch (timeIdentifier)
+                    {
+                        case "Forgot":
+                            thisMem.ReviewTime = DateTime.UtcNow.AddMinutes(5);
+                            SelectedCollectionMems.Remove(thisMem);
+                            SelectNextMem();
+                            break;
+
+                        case "Hard":
+                            thisMem.ReviewTime = DateTime.UtcNow.AddMinutes(15);
+                            SelectedCollectionMems.Remove(thisMem);
+                            SelectNextMem();
+                            break;
+
+                        case "Good":
+                            thisMem.ReviewTime = DateTime.UtcNow.AddHours(3);
+                            SelectedCollectionMems.Remove(thisMem);
+                            SelectNextMem();
+                            break;
+
+                        case "Easy":
+                            thisMem.ReviewTime = DateTime.UtcNow.AddHours(24);
+                            SelectedCollectionMems.Remove(thisMem);
+                            SelectNextMem();
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    await _unitOfWork.SaveAsync();
                 }
-
-                switch(timeIdentifier)
-                {
-                    case "Forgot":
-                        thisMem.ReviewTime = DateTime.UtcNow.AddMinutes(5);
-                        SelectedCollectionMems.Remove(thisMem);
-                        SelectNextMem();
-                        break;
-
-                    case "Hard":
-                        thisMem.ReviewTime = DateTime.UtcNow.AddMinutes(15);
-                        SelectedCollectionMems.Remove(thisMem);
-                        SelectNextMem();
-                        break;
-
-                    case "Good":
-                        thisMem.ReviewTime = DateTime.UtcNow.AddHours(3);
-                        SelectedCollectionMems.Remove(thisMem);
-                        SelectNextMem();
-                        break;
-
-                    case "Easy":
-                        thisMem.ReviewTime = DateTime.UtcNow.AddDays(1);
-                        SelectedCollectionMems.Remove(thisMem);
-                        SelectNextMem();
-                        break;
-
-                    default:
-                        break;
-                }
-
-                await _unitOfWork.SaveAsync();
             }
         }
-
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

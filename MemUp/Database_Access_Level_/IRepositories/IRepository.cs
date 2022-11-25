@@ -13,20 +13,13 @@ namespace Database_Access_Level.IRepositories
     {
         //adding data (Create)
         Task AddAsync(TEntity entity);
-        Task AddRangeAsync(IEnumerable<TEntity> entities);
 
         //getting data (Read)
         Task<TEntity?> GetByIdAsync(int id);
-        //Task<IEnumerable<TEntity>> GetTableAsync();
-        IEnumerable<TEntity> GetTable();
+
         IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
 
         //removing data (Delete)
         void Remove(TEntity entity);
-        void RemoveRange(IEnumerable<TEntity> entities);
-
-        //data binding
-        Task LoadAsync();
-        public LocalView<TEntity> Local();
     }
 }

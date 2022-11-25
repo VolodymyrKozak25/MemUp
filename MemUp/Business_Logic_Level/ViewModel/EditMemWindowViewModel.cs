@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Business_Logic_Level.ViewModel
 {
@@ -71,6 +72,15 @@ namespace Business_Logic_Level.ViewModel
 
         public async void EditMem()
         {
+            if (MainVM.CurrentMem.QuestionText == null)
+            {
+                MessageBox.Show("The mem is empty. To edit, please, select non-empty mem.",
+                    "Editing empty mem",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+
             var updatedMem = await _unitOfWork.Mems.GetByIdAsync(MainVM.CurrentMem.MemId);
 
             updatedMem.QuestionText = MemQuestion;

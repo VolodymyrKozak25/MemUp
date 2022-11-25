@@ -22,11 +22,6 @@ namespace Business_Logic.Repositories
             await context.Set<TEntity>().AddAsync(entity);
         }
 
-        public async Task AddRangeAsync(IEnumerable<TEntity> entities)
-        {
-            await context.Set<TEntity>().AddRangeAsync(entities);
-        }
-
         public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
         {
             return context.Set<TEntity>().Where(predicate);
@@ -37,33 +32,9 @@ namespace Business_Logic.Repositories
             return await context.Set<TEntity>().FindAsync(id);
         }
 
-        //public async Task<IEnumerable<TEntity>> GetTableAsync()
-        //{
-        //    return await context.Set<TEntity>().ToListAsync();
-        //}
-        public IEnumerable<TEntity> GetTable()
-        {
-            return context.Set<TEntity>().ToList();
-        }
-
         public void Remove(TEntity entity)
         {
             context.Set<TEntity>().Remove(entity);
-        }
-
-        public void RemoveRange(IEnumerable<TEntity> entities)
-        {
-            context.Set<TEntity>().RemoveRange(entities);
-        }
-
-        public async Task LoadAsync()
-        {
-            await context.Set<TEntity>().LoadAsync();
-        }
-
-        public LocalView<TEntity> Local()
-        {
-            return context.Set<TEntity>().Local;
         }
 
     }

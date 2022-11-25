@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Business_Logic_Level.ViewModel
 {
@@ -70,6 +71,15 @@ namespace Business_Logic_Level.ViewModel
 
         public async void CreateNewMem()
         {
+            if (MainVM.SelectedCollection.CollectionName == null)
+            {
+                MessageBox.Show("Please, select collection before adding new mems.",
+                    "Choose Collection",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
             var newMem = new Mem
             {
                 UserId = MainVM.CurrentUser.UserId,

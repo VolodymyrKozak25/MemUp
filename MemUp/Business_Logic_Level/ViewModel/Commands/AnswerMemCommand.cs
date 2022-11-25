@@ -24,7 +24,7 @@ namespace Business_Logic_Level.ViewModel.Commands
 
         public bool CanExecute(object? parameter)
         {
-            if (VM.SelectedCollection.CollectionName == null)
+            if (VM.SelectedCollection == null)
             {
                 return false;
             }
@@ -35,7 +35,10 @@ namespace Business_Logic_Level.ViewModel.Commands
         {
             var nextTimeIdentifier = parameter as string;
 
-            VM.AnswerButtonPressed(nextTimeIdentifier);
+            if (nextTimeIdentifier != null)
+            {
+                VM.AnswerButtonPressed(nextTimeIdentifier);
+            }
         }
     }
 }

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Business_Logic_Level.ViewModel.Commands
 {
-    public class DeleteMemCommand : ICommand
+    public class UpdateLastLoginOnCloseCommand : ICommand
     {
         public MainWindowViewModel VM { get; set; }
 
-        public DeleteMemCommand(MainWindowViewModel vm)
+        public UpdateLastLoginOnCloseCommand(MainWindowViewModel vm)
         {
             VM = vm;
         }
@@ -29,7 +30,14 @@ namespace Business_Logic_Level.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            VM.DeleteCurrentMem();
+            var sender = parameter as Window;
+
+            VM.UpdateUserLastLogin();
+
+            if (sender != null)
+            {
+                sender.Close();
+            }
         }
     }
 }
